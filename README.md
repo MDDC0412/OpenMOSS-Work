@@ -26,6 +26,7 @@ MOSS-Image 本地推理服务与配套 Web 创作台。
 - [常见问题](#常见问题)
 - [已知限制](#已知限制)
 - [许可证](#许可证)
+- [致谢](#致谢)
 
 ---
 
@@ -683,3 +684,38 @@ Get-NetTCPConnection -LocalPort 8188,3000 -State Listen
 | 4 步蒸馏 LoRA | Apache-2.0 |
 
 生成内容的使用需遵守当地法律法规及模型许可证条款。
+
+---
+
+## 致谢
+
+本项目建立在以下开源工作之上：
+
+| 项目 | 作者 / 组织 | 用途 | 许可证 |
+| --- | --- | --- | --- |
+| [MOSS-Image](https://github.com/OpenMOSS/MOSS-Image) | OpenMOSS（复旦大学） | 文生图基础模型 | Apache-2.0 |
+| [MOSS-Image EntroPack](https://huggingface.co/DiffSynth-Studio/MOSS-Image-EntroPack) | DiffSynth-Studio | 4.5 bit 量化权重与反量化实现 | Apache-2.0 |
+| [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) | ModelScope（阿里巴巴） | 推理管线、层级别 offload | Apache-2.0 |
+| [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) | Xintao Wang 等 | RRDBNet 超分网络与权重 | BSD-3-Clause |
+| [4x-UltraSharp](https://openmodeldb.info/) | Kim2091 | 超分权重（备用） | CC-BY-4.0 |
+| [PyTorch](https://pytorch.org/) | Meta AI | 深度学习框架 | BSD-3-Clause |
+| [CUDA / CuPy](https://cupy.dev/) | NVIDIA / Preferred Networks | GPU 计算、EntroPack 熵解码 | Apache-2.0 |
+| [FastAPI](https://fastapi.tiangolo.com/) | Sebastián Ramírez | 推理服务 HTTP 框架 | MIT |
+| [Next.js](https://nextjs.org/) | Vercel | 创作台框架 | MIT |
+| [React](https://react.dev/) | Meta | UI 库 | MIT |
+| [Ant Design](https://ant.design/) | 蚂蚁集团 | UI 组件库 | MIT |
+| [Tailwind CSS](https://tailwindcss.com/) | Tailwind Labs | 样式框架 | MIT |
+| [OpenAI Node SDK](https://github.com/openai/openai-node) | OpenAI | 供应商客户端 | Apache-2.0 |
+| [Vitest](https://vitest.dev/) | Anthony Fu 等 | 单元测试 | MIT |
+| [Hugging Face Hub](https://huggingface.co/docs/huggingface_hub) | Hugging Face | 权重分发 | Apache-2.0 |
+
+### 参考
+
+- MOSS-Image 技术报告：<https://arxiv.org/abs/2610.23374>
+- DiffSynth-Studio 低显存推理示例：`examples/moss_image/model_inference_low_vram/`
+
+### 声明
+
+本项目未包含上述组件的源码副本，仅通过依赖引用或权重下载使用。各组件的著作权归其
+原作者所有，遵循各自的许可证条款。模型权重不在本仓库中分发，需按
+[安装](#安装)一节自行下载。
