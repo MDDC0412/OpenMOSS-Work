@@ -1,0 +1,26 @@
+# 依赖与构建产物
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# 环境与密钥：真实数据一律放 %APPDATA%/AIGC-Creation-Platform/，不进仓库
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# 编辑器与系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 测试与日志
+coverage/
+*.log

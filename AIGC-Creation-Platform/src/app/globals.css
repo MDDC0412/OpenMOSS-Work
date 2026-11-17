@@ -1,0 +1,424 @@
+@import 'tailwindcss';
+
+/* ── 设计基调：暖黑「暗房仪器台」 ─────────────────────────────────────────
+   不用冷灰蓝，用带温度的墨黑 + 暗房安全灯的琥珀色。字体全部取自本机已装字体
+   （Bahnschrift / Cascadia Code / 微软雅黑），不依赖网络下载，离线也能保持外观。 */
+@theme {
+  --color-ink-950: #0c0a09;
+  --color-ink-900: #100e0c;
+  --color-ink-850: #16130f;
+  --color-ink-800: #1c1815;
+  --color-ink-750: #221d19;
+  --color-ink-700: #2a241e;
+  --color-line: #2e2822;
+  --color-line-soft: #241f1a;
+  --color-bone: #ede6da;
+  --color-bone-dim: #a79c8c;
+  --color-bone-faint: #6f665a;
+  --color-amber: #e0a458;
+  --color-amber-bright: #f2be79;
+  --color-jade: #79c3a0;
+  --color-coral: #e2705f;
+  --color-sky: #7fa8d9;
+
+  --font-display: 'Bahnschrift', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+  --font-body: 'Segoe UI Variable Text', 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'Cascadia Code', 'Cascadia Mono', 'Consolas', monospace;
+}
+
+/* ── 基础层 ────────────────────────────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  /* 侧栏宽度只有这一个真值，壳层与页面留白都引用它，避免两处写死后对不齐 */
+  --rail-w: 236px;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-ink-900);
+  color: var(--color-bone);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 颗粒噪点：给纯色背景一点胶片质感。用 SVG 湍流生成，不引入任何图片资源 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 顶部一抹琥珀晕光，让大面积暗色不至于死板 */
+body::after {
+  content: '';
+  position: fixed;
+  top: -220px;
+  left: var(--rail-w);
+  width: 720px;
+  height: 460px;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(224, 164, 88, 0.09), transparent 68%);
+}
+
+::selection {
+  background: rgba(224, 164, 88, 0.28);
+  color: var(--color-bone);
+}
+
+/* 滚动条收细并染成暖色，避免系统默认的亮灰条破坏暗色氛围 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-700) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-ink-700);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a322a;
+  background-clip: content-box;
+}
+
+/* ── 复用构件 ──────────────────────────────────────────────────────────── */
+
+/* 面板：仪器台上的一块块模块，靠发丝线分隔而不是靠阴影堆叠 */
+.panel {
+  position: relative;
+  background: linear-gradient(180deg, var(--color-ink-850), var(--color-ink-800));
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+}
+
+/* 小标签：等宽 + 字距拉开，像设备上的丝印 */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-bone-faint);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-ligatures: none;
+}
+
+/* 页面标题用 Bahnschrift，字重压到 500 保持工业感而不是粗黑体 */
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* 入场：整页一次性错峰浮现，比散落的微交互更克制也更有秩序 */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.42s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+/* 状态灯：体检结果用小圆点表达，点亮时带一圈同色光晕 */
+@keyframes lamp {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 currentColor;
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 4px transparent;
+    opacity: 0.55;
+  }
+}
+.lamp-live {
+  animation: lamp 1.4s ease-in-out infinite;
+}
+
+/* ── 显影动效：生成中占位框，延续暗房安全灯语言 ─────────────────────────
+   扫描线自上而下 sweep、颗粒抖动、琥珀呼吸光、四角对位标记错峰闪烁，
+   让"正在出图"这几分钟里绘制区域始终是活的。 */
+@keyframes develop-scan {
+  0% {
+    top: -22%;
+  }
+  60% {
+    top: 108%;
+  }
+  100% {
+    top: 108%;
+  }
+}
+.develop-scan {
+  height: 22%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(224, 164, 88, 0.12) 42%,
+    rgba(242, 190, 121, 0.3) 50%,
+    rgba(224, 164, 88, 0.12) 58%,
+    transparent
+  );
+  animation: develop-scan 3.4s cubic-bezier(0.45, 0.1, 0.4, 0.9) infinite;
+}
+
+@keyframes develop-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+.develop-glow {
+  background: radial-gradient(ellipse at 50% 62%, rgba(224, 164, 88, 0.17), transparent 72%);
+  animation: develop-breathe 2.8s ease-in-out infinite;
+}
+
+/* 颗粒层复用 body 的湍流噪点，steps 跳变模拟胶片颗粒的闪烁 */
+@keyframes develop-grain {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: -42px 31px;
+  }
+  50% {
+    background-position: 33px -54px;
+  }
+  75% {
+    background-position: -27px -19px;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+.develop-grain {
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: develop-grain 0.8s steps(2) infinite;
+}
+
+@keyframes develop-corner {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+.develop-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--color-amber);
+  animation: develop-corner 1.8s ease-in-out infinite;
+}
+
+/* 用户系统偏好减少动效时，显影框退化为静态琥珀微光，不闪不扫 */
+@media (prefers-reduced-motion: reduce) {
+  .develop-scan,
+  .develop-glow,
+  .develop-grain,
+  .develop-corner {
+    animation: none;
+  }
+  .develop-scan {
+    display: none;
+  }
+}
+
+/* JSON / 原始请求面板：等宽、可滚动、行高收紧以便一屏看更多字段 */
+.code-block {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+  color: #cfc4b2;
+}
+
+/* AntD 的 TextArea 在原始请求模式下要长得像代码编辑器 */
+.code-input.ant-input {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  background: var(--color-ink-950);
+  color: #cfc4b2;
+}
+
+/* 表单被原始请求接管时整体压暗，明确告诉用户"这些格子现在不算数" */
+.form-locked {
+  opacity: 0.4;
+  filter: saturate(0.35);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 侧栏当前项：左侧一道琥珀竖条 + 极淡的暖色填充 */
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 14px 9px 18px;
+  border-radius: 8px;
+  color: var(--color-bone-dim);
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
+}
+.nav-item:hover {
+  background: rgba(224, 164, 88, 0.06);
+  color: var(--color-bone);
+}
+.nav-item[data-active='true'] {
+  background: rgba(224, 164, 88, 0.1);
+  color: var(--color-amber-bright);
+}
+.nav-item[data-active='true']::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5px;
+  height: 17px;
+  border-radius: 2px;
+  background: var(--color-amber);
+}
+.nav-item[data-disabled='true'] {
+  color: var(--color-bone-faint);
+  cursor: not-allowed;
+}
+.nav-item[data-disabled='true']:hover {
+  background: transparent;
+  color: var(--color-bone-faint);
+}
+
+/* ── 模型回答的 markdown 排版 ───────────────────────────────────────────
+   只调间距与代码块配色，正文继承面板字色，避免回答区看起来像另一个网站。 */
+.md > :first-child {
+  margin-top: 0;
+}
+.md > :last-child {
+  margin-bottom: 0;
+}
+.md p,
+.md ul,
+.md ol,
+.md blockquote,
+.md table,
+.md pre {
+  margin: 0.6em 0;
+}
+.md h1,
+.md h2,
+.md h3,
+.md h4 {
+  font-family: var(--font-display);
+  color: var(--color-bone);
+  margin: 1.1em 0 0.45em;
+  line-height: 1.35;
+}
+.md h1 {
+  font-size: 1.35em;
+}
+.md h2 {
+  font-size: 1.2em;
+}
+.md h3,
+.md h4 {
+  font-size: 1.05em;
+}
+.md ul,
+.md ol {
+  padding-left: 1.5em;
+}
+.md li {
+  margin: 0.25em 0;
+}
+.md li > ul,
+.md li > ol {
+  margin: 0.25em 0;
+}
+.md a {
+  color: var(--color-amber-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.md code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: rgba(224, 164, 88, 0.1);
+  border: 1px solid rgba(224, 164, 88, 0.16);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+.md pre {
+  background: var(--color-ink-950);
+  border: 1px solid var(--color-line-soft);
+  border-radius: 8px;
+  padding: 12px 14px;
+  overflow-x: auto;
+}
+.md pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #cfc4b2;
+}
+.md blockquote {
+  border-left: 2.5px solid var(--color-amber);
+  padding-left: 12px;
+  color: var(--color-bone-dim);
+}
+.md table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.999em;
+}
+.md th,
+.md td {
+  border: 1px solid var(--color-line);
+  padding: 6px 10px;
+  text-align: left;
+}
+.md th {
+  background: var(--color-ink-750);
+  color: var(--color-bone);
+}
+.md hr {
+  border: none;
+  border-top: 1px solid var(--color-line);
+  margin: 1.2em 0;
+}
